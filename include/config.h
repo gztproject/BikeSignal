@@ -1,0 +1,12 @@
+#define BTN1PIN GPIO0
+#define BTN2PIN GPIO1
+#define BTN3PIN GPIO2
+#define BTN4PIN GPIO3
+
+#define BTN1LED GPIO4
+#define BTN2LED GPIO5
+#define BTN3LED GPIO6
+#define BTN4LED GPIO7
+
+#define LED_LOW_INT 0
+#define LED_HIGH_INT 255

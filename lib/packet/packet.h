@@ -14,7 +14,7 @@
  * |                               |                                | 1 | X | X | COMANND        | 0 | 0 | A | B | C | REQUEST n(ABC)      |
  * | A B C D E F G H | n(ABCDEFGH) | A B C D E F G H | n(ABCDEFGH)  | 1 | X | X | COMMAND        | 0 | 1 | A | B | C | CANCEL  n(ABC)      |
  * |                               |                                | 1 | X | X | COMMAND        | 1 | 0 | A | B | C | ACKNOWLEDGE  n(ABC) |
- * |                               |                                | 1 | X | X | COMMAND        | 1 | 1 | X | X | X | RESERVED            |
+ * |                               |                                | 1 | X | X | COMMAND        | 1 | 1 | A | B | C | CLEAR n(ABC         |
  * |_______________________________________________________________________________________________________________________________________|
  */
 
@@ -96,7 +96,7 @@ typedef enum
     REQUEST = 0b00,
     CANCEL = 0b01,
     ACKNOWLEDGE = 0b10,
-    RESERVED = 0b11,
+    CLEAR = 0b11,
     SYNC_ARG = 255
 } commands;
 

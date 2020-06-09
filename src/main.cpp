@@ -1,8 +1,11 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
 
+#include "config.h"
+
 #include "packet.h"
 #include "packetStore.h"
+#include "btnPanel.h"
 
 #define SYNC_TIMEOUT 5 * 60 * 1000
 #define SYNC_ID 0b11111
@@ -68,6 +71,11 @@ packet txPacket;
 packetStore stack;
 
 void sendPacket(packet packet);
+void executeCommand(packet packet);
+
+btnPanel panel(BTN1PIN, BTN2PIN, BTN3PIN, BTN4PIN, BTN1LED, BTN2LED, BTN3LED, BTN4LED);
+bool local[N_BUTTONS] = {true, true, true, true};
+uint8_t oldState = 0;
 
 void setup()
 {
@@ -94,7 +102,30 @@ void setup()
                       LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
                       0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
 
-    pinMode(BTN_PIN, INPUT_PULLUP);
+    panel.begin();
+
+    for (uint8_t i = 0; i < N_BUTTONS; i++)
+    {
+        panel.ledOn(i);
+        panel.refreshLeds();
+        delay(100);
+    }
+    for (uint8_t i = 0; i < N_BUTTONS; i++)
+    {
+        panel.ledToggle(i);
+        panel.refreshLeds();
+        delay(100);
+        panel.ledToggle(i);
+        panel.refreshLeds();
+        delay(100);
+    }
+
+    for (uint8_t i = 0; i < N_BUTTONS; i++)
+    {
+        panel.ledOff(i);
+        panel.refreshLeds();
+        delay(100);
+    }
 
     turnOnRGB(COLOR_SEND, 0);
     packet syncPacket(0, TTL, nodeId);
@@ -111,7 +142,63 @@ void loop()
         turnOnRGB(0, 0);
         Radio.Rx(0);
 
-        newCmd = digitalRead(BTN_PIN) == LOW;
+        panel.readButtons();
+        panel.refreshLeds();
+
+        if (panel.state != oldState)
+        {
+            Serial.println("Buttons state changed, entering local buttons loop.");
+            for (uint8_t i = 0; i < N_BUTTONS; i++)
+            {
+                if (panel.getLedState(i) == OFF && panel.getButton(i))
+                {
+                    Serial.print("Signalling request ");
+                    packet packet(txNumber, TTL, COMMAND, REQUEST, i);
+                    sendPacket(packet);
+                    Serial.println(".");
+                    panel.blinkLed(i);
+                    local[i] = true;
+                    continue;
+                }
+                if (panel.getLedState(i) == ON && panel.getButton(i))
+                {
+                    if (!local[i])
+                    {
+                        Serial.print("Clearing ACK ");
+                        packet packet(txNumber, TTL, COMMAND, CLEAR, i);
+                        sendPacket(packet);
+                        Serial.println(".");
+                        panel.ledOff(i);
+                        local[i] = true;
+                    }
+                    continue;
+                }
+                if (panel.getLedState(i) == BLINKING && panel.getButton(i))
+                {
+                    if (local[i])
+                    {
+                        Serial.print("Cancelling request ");
+                        packet packet(txNumber, TTL, COMMAND, CANCEL, i);
+                        sendPacket(packet);
+                        Serial.println(".");
+                        panel.ledOff(i);
+                        local[i] = true;
+                    }
+                    else
+                    {
+                        Serial.print("Sending ACK for request ");
+                        packet packet(txNumber, TTL, COMMAND, ACKNOWLEDGE, i);
+                        sendPacket(packet);
+                        Serial.println(".");
+                        panel.ledOn(i);
+                        local[i] = true;
+                    }
+                    continue;
+                }
+                oldState = panel.state;
+            }
+            Serial.println();
+        }
 
         if (nodeId == SYNC_ID && millis() - lastSync > INIT_TIMEOUT)
         {
@@ -230,8 +317,10 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
         Serial.print("\r\nRetransmitting command message.");
         txNumber = packet.getId() > txNumber ? packet.getId() : txNumber;
         sendPacket(packet);
+
+        executeCommand(packet);
+
         state = LOWPOWER;
-        //Execute command here?
         return;
     }
 
@@ -242,10 +331,6 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 
 void sendPacket(packet packet)
 {
-    // Serial.print("\n\n\n\rCLONING:\n\r");
-    // packet.debug();
-    // txPacket.clone(packet);
-    // txPacket.debug();
     txPacket = packet;
     delay(TX_DLY * nodeId);
     packet.decreaseTtl();
@@ -258,4 +343,60 @@ void sendPacket(packet packet)
     Serial.printf("\r\n%X with length %d.\n\n", payload, sizeof(payload));
     packet.getPayload(payload);
     Radio.Send(payload, sizeof(payload));
+}
+
+void executeCommand(packet packet)
+{
+    uint8_t input = packet.getArg();
+    uint8_t command = packet.getCommand();
+    Serial.print("Received external input ");
+    Serial.print(input);
+    Serial.println(", entering remote buttons loop.");
+    for (uint8_t i = 0; i < N_BUTTONS; i++)
+    {
+
+        //if (panel.getLedState(i) == 0 && input == i)
+        if (command == REQUEST && input == i)
+        {
+            Serial.print("Received request ");
+            Serial.print(i);
+            Serial.println(".");
+            panel.blinkLed(i);
+            local[i] = false;
+            continue;
+        }
+        //if (panel.getLedState(i) == 1 && input == i)
+        if (command == CLEAR && input == i)
+        {
+            Serial.print("Received clear ACK ");
+            Serial.print(i);
+            Serial.println(".");
+            panel.ledOff(i);
+            local[i] = false;
+
+            continue;
+        }
+        //if (panel.getLedState(i) == 2 && input == i)
+        if (command == CANCEL && input == i)
+        {
+            Serial.print("Received cancellation for request ");
+            Serial.print(i);
+            Serial.println(".");
+            panel.ledOff(i);
+            local[i] = false;
+            continue;
+        }
+
+        if (command == ACKNOWLEDGE && input == i)
+        {
+            Serial.print("Received ACK for request ");
+            Serial.print(i);
+            Serial.println(".");
+            panel.ledOn(i);
+            local[i] = false;
+            continue;
+        }
+    }
+    oldState = panel.state;
+    Serial.println();
 }
