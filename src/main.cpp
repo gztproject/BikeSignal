@@ -19,9 +19,9 @@
  * RGB red means sending;
  * RGB green means received done;
  */
-#ifndef LoraWan_RGB
+//#ifndef LoraWan_RGB
 #define LoraWan_RGB 0
-#endif
+//#endif
 
 #define RF_FREQUENCY 868000000 // Hz
 
@@ -64,7 +64,6 @@ States_t state;
 bool sleepMode = false;
 int16_t Rssi, rxSize, Snr;
 uint32_t lastSync;
-bool newCmd;
 
 packet txPacket;
 
@@ -84,7 +83,6 @@ void setup()
     nodeId = SYNC_ID;
     txNumber = 1;
     Rssi = 0;
-    newCmd = false;
 
     RadioEvents.TxDone = OnTxDone;
     RadioEvents.TxTimeout = OnTxTimeout;
@@ -127,11 +125,10 @@ void setup()
         delay(100);
     }
 
-    turnOnRGB(COLOR_SEND, 0);
+    //turnOnRGB(COLOR_SEND, 0);
     packet syncPacket(0, TTL, nodeId);
     sendPacket(syncPacket);
     lastSync = millis();
-    state = LOWPOWER;
 }
 
 void loop()
@@ -139,7 +136,7 @@ void loop()
     switch (state)
     {
     case RX:
-        turnOnRGB(0, 0);
+        //turnOnRGB(0, 0);
         Radio.Rx(0);
 
         panel.readButtons();
@@ -154,8 +151,7 @@ void loop()
                 {
                     Serial.print("Signalling request ");
                     packet packet(txNumber, TTL, COMMAND, REQUEST, i);
-                    sendPacket(packet);
-                    Serial.println(".");
+                    sendPacket(packet);                    
                     panel.blinkLed(i);
                     local[i] = true;
                     continue;
@@ -167,7 +163,6 @@ void loop()
                         Serial.print("Clearing ACK ");
                         packet packet(txNumber, TTL, COMMAND, CLEAR, i);
                         sendPacket(packet);
-                        Serial.println(".");
                         panel.ledOff(i);
                         local[i] = true;
                     }
@@ -180,7 +175,6 @@ void loop()
                         Serial.print("Cancelling request ");
                         packet packet(txNumber, TTL, COMMAND, CANCEL, i);
                         sendPacket(packet);
-                        Serial.println(".");
                         panel.ledOff(i);
                         local[i] = true;
                     }
@@ -189,7 +183,6 @@ void loop()
                         Serial.print("Sending ACK for request ");
                         packet packet(txNumber, TTL, COMMAND, ACKNOWLEDGE, i);
                         sendPacket(packet);
-                        Serial.println(".");
                         panel.ledOn(i);
                         local[i] = true;
                     }
@@ -197,34 +190,20 @@ void loop()
                 }
                 oldState = panel.state;
             }
-            Serial.println();
         }
 
         if (nodeId == SYNC_ID && millis() - lastSync > INIT_TIMEOUT)
         {
-            Serial.printf("\n\rGot %u SYNC responses, setting my nodeID: %u\n\n", stack.getSize(), stack.getMaxSyncId());
+            Serial.printf("\n\rGot %u SYNC responses, biggest nodeID was %u\n\n", stack.getSize(), stack.getMaxSyncId());
             nodeId = stack.getMaxSyncId() + 1;
-            stack.clear();
-            state = RX;
-            lastSync = millis();
-            txNumber += 1;
+            stack.clear();            
+            lastSync = millis();            
             break;
-        }
-
-        if (newCmd) // SENDING A NEW COMMAND
-        {
-            txNumber += 1;
-            packet packet(txNumber, TTL, COMMAND, 0, 0);
-            sendPacket(packet);
-            state = LOWPOWER;
-            break;
-        }
-
-        state = RX;
+        }    
         break;
 
     case LOWPOWER:
-        turnOnRGB(0, 0);
+        //turnOnRGB(0, 0);
         lowPowerHandler();
         break;
 
@@ -238,13 +217,12 @@ void loop()
 void OnTxDone(void)
 {
     Serial.print("\n\rTX done......");
+    txNumber += 1;
     if (nodeId != SYNC_ID)
     {
-        Serial.print("\n\rPushing packet to stack.");
         stack.push(txPacket.getStruct());
-        newCmd = false;
     }
-    turnOnRGB(0, 0);
+    //turnOnRGB(0, 0);
     state = RX;
     Serial.print("\n\rGoing to RX!");
     Serial.printf(" - nodeId: %u", nodeId);
@@ -253,9 +231,8 @@ void OnTxDone(void)
 void OnTxTimeout(void)
 {
     Radio.Sleep();
-    Serial.print("\n\rTX Timeout, retrying. ");
+    Serial.printf("\n\rTX Timeout, retrying. State: %u", state);
     sendPacket(txPacket);
-    state = LOWPOWER;
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
@@ -264,17 +241,18 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
     rxSize = size;
     Snr = snr;
     packet packet(payload);
-    turnOnRGB(COLOR_RECEIVED, 0);
+    //turnOnRGB(COLOR_RECEIVED, 0);
     Radio.Sleep();
 
     Serial.printf("\r\nReceived packet ");
     packet.debug();
     Serial.printf("; Rssi %d, SNR %d and length %d\n\n", Rssi, Snr, rxSize);
 
+    txNumber = packet.getId() > txNumber ? packet.getId() : txNumber;
+
     if (packet.getTtl() <= 0)
     {
-        Serial.print("\r\nTTL timeout, ignoring.");
-        state = RX;
+        Serial.print("\r\nTTL timeout, ignoring.");        
         return;
     }
 
@@ -285,7 +263,6 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
         {
             Serial.print("\n\rReceived an existing ID packet.");
             stack.push(packet.getStruct());
-            state = RX;
             return;
         }
 
@@ -302,7 +279,6 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 
         packet.setId(txNumber);
         sendPacket(packet);
-        state = LOWPOWER;
         return;
     }
 
@@ -315,12 +291,8 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
             return;
         }
         Serial.print("\r\nRetransmitting command message.");
-        txNumber = packet.getId() > txNumber ? packet.getId() : txNumber;
         sendPacket(packet);
-
         executeCommand(packet);
-
-        state = LOWPOWER;
         return;
     }
 
@@ -333,16 +305,23 @@ void sendPacket(packet packet)
 {
     txPacket = packet;
     delay(TX_DLY * nodeId);
-    packet.decreaseTtl();
-    turnOnRGB(COLOR_SEND, 0);
+    txPacket.decreaseTtl();
+    if (packet.getTtl() <= 0)
+    {
+        Serial.print("\r\nTTL timeout, ignoring.");
+        state = RX;
+        return;
+    }
+    //turnOnRGB(COLOR_SEND, 0);
 
     Serial.print("\r\nSending packet:");
     packet.debug();
 
     byte payload[BUFFER_SIZE];
-    Serial.printf("\r\n%X with length %d.\n\n", payload, sizeof(payload));
-    packet.getPayload(payload);
+    txPacket.getPayload(payload);
     Radio.Send(payload, sizeof(payload));
+    state = LOWPOWER;
+    return;
 }
 
 void executeCommand(packet packet)
@@ -373,7 +352,6 @@ void executeCommand(packet packet)
             Serial.println(".");
             panel.ledOff(i);
             local[i] = false;
-
             continue;
         }
         //if (panel.getLedState(i) == 2 && input == i)

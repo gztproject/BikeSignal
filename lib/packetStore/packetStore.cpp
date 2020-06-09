@@ -37,14 +37,12 @@ bool packetStore::isPacketKnown(packet_s pack)
     Serial.printf("\n\rChecking the packet store for known packets...");
     for (int i = 0; i < PACKET_STORE_SIZE; i++)
     {
-        if (stack[i].id == pack.id && stack[i].type == pack.type && stack[i].cmd == pack.cmd && stack[i].arg == pack.arg)
+        if (stack[i].id == pack.id && stack[i].type == pack.type && (pack.type == SYNC || (stack[i].cmd == pack.cmd && stack[i].arg == pack.arg)))
         {
-
             Serial.print(" Found one!");
             return true;
         }
     }
-
     Serial.print(" Nothing here!");
     return false;
 }
