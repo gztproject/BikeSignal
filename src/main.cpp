@@ -182,7 +182,7 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 
     Serial.printf("\r\nReceived packet ");
     packet.debug();
-    Serial.printf("Rssi %d, SNR %d and length %d\n\n", Rssi, Snr, rxSize);
+    Serial.printf("; Rssi %d, SNR %d and length %d\n\n", Rssi, Snr, rxSize);
 
     if (packet.getTtl() <= 0)
     {
@@ -242,10 +242,11 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 
 void sendPacket(packet packet)
 {
-    Serial.print("\n\n\n\rCLONING:\n\r");
-    packet.debug();
-    txPacket.clone(packet);
-    txPacket.debug();
+    // Serial.print("\n\n\n\rCLONING:\n\r");
+    // packet.debug();
+    // txPacket.clone(packet);
+    // txPacket.debug();
+    txPacket = packet;
     delay(TX_DLY * nodeId);
     packet.decreaseTtl();
     turnOnRGB(COLOR_SEND, 0);

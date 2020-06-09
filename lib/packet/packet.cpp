@@ -4,7 +4,7 @@ packet::packet()
 {
     packetId = 0;
     packetTtl = 0;
-    packetCommand = EMPTY << 5;
+    packetCommand = (EMPTY << 5);
 }
 
 packet::packet(byte *payload)
@@ -19,16 +19,16 @@ packet::packet(uint8_t id, uint8_t ttl, uint8_t type, uint8_t command, uint8_t a
     packetId = constrain(id, 0, 0xFF);
     packetTtl = constrain(ttl, 0, 0xFF);
     if (type == SYNC)
-        packetCommand = constrain(type, 0b000, 0b111) << 5 + constrain(arg, 0b00000, 0b11111);
+        packetCommand = (constrain(type, 0b000, 0b111) << 5) + constrain(arg, 0b00000, 0b11111);
     if (type == COMMAND)
-        packetCommand = constrain(type, 0b000, 0b111) << 5 + constrain(command, 0b00, 0b11) << 3 + constrain(arg, 0b000, 0b111);
+        packetCommand = (constrain(type, 0b000, 0b111) << 5) + (constrain(command, 0b00, 0b11) << 3) + constrain(arg, 0b000, 0b111);
 }
 
 packet::packet(uint8_t id, uint8_t ttl, uint8_t arg)
 {
     packetId = constrain(id, 0, 0xFF);
     packetTtl = constrain(ttl, 0, 0xFF);
-    packetCommand = SYNC << 5 + constrain(arg, 0b00000, 0b11111);
+    packetCommand = (SYNC << 5) + constrain(arg, 0b00000, 0b11111);
 }
 
 packet::packet(packet_s packet)
@@ -36,16 +36,16 @@ packet::packet(packet_s packet)
     packetId = constrain(packet.id, 0, 0xFF);
     packetTtl = constrain(packet.ttl, 0, 0xFF);
     if (packet.type == SYNC)
-        packetCommand = constrain(packet.type, 0b000, 0b111) << 5 + constrain(packet.arg, 0b00000, 0b11111);
+        packetCommand = (constrain(packet.type, 0b000, 0b111) << 5) + constrain(packet.arg, 0b00000, 0b11111);
     if (packet.type == COMMAND)
-        packetCommand = constrain(packet.type, 0b000, 0b111) << 5 + constrain(packet.cmd, 0b00, 0b11) << 3 + constrain(packet.arg, 0b000, 0b111);
+        packetCommand = (constrain(packet.type, 0b000, 0b111) << 5) + (constrain(packet.cmd, 0b00, 0b11) << 3) + constrain(packet.arg, 0b000, 0b111);
 }
 
 void packet::clone(packet original)
 {
     packetId = original.getId();
     packetTtl = original.getTtl();
-    packetCommand = original.getType() << 5;
+    packetCommand = (original.getType() << 5);
     if (original.getType() == SYNC)
         packetCommand += original.getArg();
     if (original.getType() == COMMAND)
@@ -108,7 +108,7 @@ uint8_t packet::setSyncArg(uint8_t id)
     if (getType() == SYNC)
     {
         Serial.print("\n\rSetting ID argument.");
-        packetCommand = SYNC << 5 + constrain(id, 0b00000, 0b11111);
+        packetCommand = (SYNC << 5) + constrain(id, 0b00000, 0b11111);
     }
     else
         Serial.print("\n\rTrying to set ID argument on non SYNC packet.");
@@ -126,7 +126,7 @@ void packet::debug()
     Serial.printf("\n\rID: %u, TTL: %u, TYPE: ", getId(), getTtl());
     if (getType() == SYNC)
     {
-        Serial.printf("Sync, ARG:", getArg());
+        Serial.printf("Sync, ARG: %u", getArg());
     }
     if (getType() == COMMAND)
     {
@@ -139,5 +139,4 @@ void packet::debug()
             Serial.print("Acknowledge");
         Serial.printf(", ARG %u", getArg());
     }
-    Serial.printf(", RAW: %X", packetCommand);
 }
