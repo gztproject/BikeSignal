@@ -35,13 +35,17 @@ class packet
 
 public:
     /**
+     * Create an empty packet
+     */
+    packet();
+    /**
      * Initialize - encode a command packet
      */
     packet(uint8_t id, uint8_t ttl, uint8_t type, uint8_t command, uint8_t arg);
     /**
      * Initialize - encode a sync packet
      */
-    packet(uint8_t id, uint8_t ttl, uint8_t type, uint8_t arg);
+    packet(uint8_t id, uint8_t ttl, uint8_t arg);
     /**
      * Initialize - encode a packet from the struct
      */
@@ -50,6 +54,8 @@ public:
      * Initialize - decode packet from payload
      */
     packet(byte *payload);    
+
+    void clone(packet original);
 
     /**
      * Write packet payload into a TX buffer      
@@ -61,10 +67,12 @@ public:
     packet_s getStruct();
 
     uint8_t getId();
+    uint8_t setId(uint8_t id);
     uint8_t getTtl();
     uint8_t getType();
     uint8_t getCommand();
     uint8_t getArg();
+    uint8_t setSyncArg(uint8_t id);
 
     uint8_t decreaseTtl();
 
@@ -79,7 +87,8 @@ private:
 typedef enum
 {
     SYNC = 0b000,
-    COMMAND = 0b100
+    COMMAND = 0b100,
+    EMPTY = 0b111
 } types;
 
 typedef enum

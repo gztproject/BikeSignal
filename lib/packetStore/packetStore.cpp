@@ -2,12 +2,14 @@
 
 packetStore::packetStore()
 {
-    Serial.printf("\n\n\n\n\rInitializing packet store:");
+    if (Serial.available())
+        Serial.printf("\n\n\n\n\rInitializing packet store:");
     clear();
 }
 
 void packetStore::push(packet_s pack)
 {
+
     Serial.printf("\n\rPushing the packet on the stack...");
     for (int i = PACKET_STORE_SIZE - 1; i >= 0; i--)
     {
@@ -37,10 +39,12 @@ bool packetStore::isPacketKnown(packet_s pack)
     {
         if (stack[i].id == pack.id && stack[i].type == pack.type && stack[i].cmd == pack.cmd && stack[i].arg == pack.arg)
         {
+
             Serial.print(" Found one!");
             return true;
         }
     }
+
     Serial.print(" Nothing here!");
     return false;
 }

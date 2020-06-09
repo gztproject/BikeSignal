@@ -52,13 +52,9 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
 
 typedef enum
 {
-    INIT,
-    LOWPOWER,
     RX,
-    TX
+    LOWPOWER
 } States_t;
-
-byte payload[BUFFER_SIZE];
 
 int8_t txNumber;
 States_t state;
@@ -67,13 +63,16 @@ int16_t Rssi, rxSize, Snr;
 uint32_t lastSync;
 bool newCmd;
 
-packetStore store();
+packet txPacket;
+
+packetStore stack;
+
+void sendPacket(packet packet);
 
 void setup()
 {
     boardInitMcu();
     Serial.begin(115200);
-
     nodeId = SYNC_ID;
     txNumber = 1;
     Rssi = 0;
@@ -94,30 +93,20 @@ void setup()
                       LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
                       LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
                       0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
-    state = INIT;
 
     pinMode(BTN_PIN, INPUT_PULLUP);
+
+    turnOnRGB(COLOR_SEND, 0);
+    packet syncPacket(0, TTL, nodeId);
+    sendPacket(syncPacket);
+    lastSync = millis();
+    state = LOWPOWER;
 }
 
 void loop()
 {
-
     switch (state)
     {
-    case INIT:
-        turnOnRGB(COLOR_SEND, 0);
-
-        packet packet(0, TTL, SYNC, nodeId);
-
-        Serial.print("\r\nSending SYNC packet:");
-        packet.debug();
-        packet.getPayload(payload);
-
-        Radio.Send(payload, sizeof(payload));
-        lastSync = millis();
-        state = LOWPOWER;
-        break;
-
     case RX:
         turnOnRGB(0, 0);
         Radio.Rx(0);
@@ -126,9 +115,9 @@ void loop()
 
         if (nodeId == SYNC_ID && millis() - lastSync > INIT_TIMEOUT)
         {
-            Serial.printf("\n\rGot %u SYNC responses, setting my nodeID: %u\n\n", store.getSize(), store.getMaxSyncId());
-            nodeId = store.getMaxSyncId() + 1;
-            store.clear();
+            Serial.printf("\n\rGot %u SYNC responses, setting my nodeID: %u\n\n", stack.getSize(), stack.getMaxSyncId());
+            nodeId = stack.getMaxSyncId() + 1;
+            stack.clear();
             state = RX;
             lastSync = millis();
             txNumber += 1;
@@ -138,23 +127,13 @@ void loop()
         if (newCmd) // SENDING A NEW COMMAND
         {
             txNumber += 1;
-            getCmdPacket(txNumber, TTL, 0, 0);
-            state = TX;
+            packet packet(txNumber, TTL, COMMAND, 0, 0);
+            sendPacket(packet);
+            state = LOWPOWER;
             break;
         }
 
         state = RX;
-        break;
-
-    case TX:
-        delay(TX_DLY * nodeId);
-        decreaseTtl(packet);
-        turnOnRGB(COLOR_SEND, 0);
-
-        Serial.printf("\r\nSending packet %X , length %d\n\n", packet, sizeof(packet));
-
-        Radio.Send(packet, sizeof(packet));
-        state = LOWPOWER;
         break;
 
     case LOWPOWER:
@@ -172,11 +151,10 @@ void loop()
 void OnTxDone(void)
 {
     Serial.print("\n\rTX done......");
-    packet_s pack = decodePacket(packet);
-    if (pack.type == COMMAND)
+    if (nodeId != SYNC_ID)
     {
         Serial.print("\n\rPushing packet to stack.");
-        pushPacketToArray(pack);
+        stack.push(txPacket.getStruct());
         newCmd = false;
     }
     turnOnRGB(0, 0);
@@ -188,9 +166,9 @@ void OnTxDone(void)
 void OnTxTimeout(void)
 {
     Radio.Sleep();
-    Serial.print("\n\rTX Timeout......\n\n\r");
-    state = TX;
-    Serial.print("\n\r Retrying...");
+    Serial.print("\n\rTX Timeout, retrying. ");
+    sendPacket(txPacket);
+    state = LOWPOWER;
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
@@ -198,62 +176,61 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
     Rssi = rssi;
     rxSize = size;
     Snr = snr;
-    memcpy(packet, payload, size);
-    packet[size] = '\0';
+    packet packet(payload);
     turnOnRGB(COLOR_RECEIVED, 0);
     Radio.Sleep();
 
-    Serial.printf("\r\nReceived packet %X with Rssi %d, SNR %d and length %d\n\n", packet, Rssi, Snr, rxSize);
-    packet_s pack = decodePacket(packet);
+    Serial.printf("\r\nReceived packet ");
+    packet.debug();
+    Serial.printf("Rssi %d, SNR %d and length %d\n\n", Rssi, Snr, rxSize);
 
-    if (pack.ttl <= 0)
+    if (packet.getTtl() <= 0)
     {
         Serial.print("\r\nTTL timeout, ignoring.");
         state = RX;
         return;
     }
 
-    if (pack.type == SYNC)
+    if (packet.getType() == SYNC)
     {
         Serial.printf("\r\nGot SYNC packet, my nodeId is %u and it's been %ums since last sync (tresh %ums)", nodeId, millis() - lastSync, INIT_TIMEOUT);
         if (nodeId == SYNC_ID && millis() - lastSync <= INIT_TIMEOUT)
         {
             Serial.print("\n\rReceived an existing ID packet.");
-            pushPacketToSyncArray(pack);
+            stack.push(packet.getStruct());
             state = RX;
             return;
         }
 
         Serial.print("\n\rI have my ID already");
-
-        if (nodeId > pack.arg || pack.arg == SYNC_ID)
+        if (nodeId > packet.getArg() || packet.getArg() == SYNC_ID)
         {
             Serial.print(" and it's bigger than the one I just received so I'm sending it out.");
-            pack.arg = nodeId;
+            packet.setSyncArg(nodeId);
         }
         else
         {
             Serial.print(" but it's lower than the one I just received so I'm just repeating that one.");
         }
 
-        pack.id = txNumber;
-        encodePacket(pack, packet);
-        state = TX;
+        packet.setId(txNumber);
+        sendPacket(packet);
+        state = LOWPOWER;
         return;
     }
 
-    if (pack.type == COMMAND)
+    if (packet.getType() == COMMAND)
     {
-        if (isPacketKnown(pack))
+        if (stack.isPacketKnown(packet.getStruct()))
         {
             Serial.print("\r\nI already retransmitted this one, ignoring.");
             state = RX;
             return;
         }
         Serial.print("\r\nRetransmitting command message.");
-        txNumber = pack.id > txNumber ? pack.id : txNumber;
-        encodePacket(pack, packet);
-        state = TX;
+        txNumber = packet.getId() > txNumber ? packet.getId() : txNumber;
+        sendPacket(packet);
+        state = LOWPOWER;
         //Execute command here?
         return;
     }
@@ -261,4 +238,23 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
     Serial.print("\r\nUnknown packet type, ignoring.");
     state = RX;
     return;
+}
+
+void sendPacket(packet packet)
+{
+    Serial.print("\n\n\n\rCLONING:\n\r");
+    packet.debug();
+    txPacket.clone(packet);
+    txPacket.debug();
+    delay(TX_DLY * nodeId);
+    packet.decreaseTtl();
+    turnOnRGB(COLOR_SEND, 0);
+
+    Serial.print("\r\nSending packet:");
+    packet.debug();
+
+    byte payload[BUFFER_SIZE];
+    Serial.printf("\r\n%X with length %d.\n\n", payload, sizeof(payload));
+    packet.getPayload(payload);
+    Radio.Send(payload, sizeof(payload));
 }
