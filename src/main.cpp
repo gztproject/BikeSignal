@@ -139,19 +139,18 @@ void loop()
         //turnOnRGB(0, 0);
         Radio.Rx(0);
 
-        panel.readButtons();
-        panel.refreshLeds();
+        panel.readButtons();        
 
         if (panel.state != oldState)
         {
-            Serial.println("Buttons state changed, entering local buttons loop.");
+            Serial.print("\n\rButtons state changed, entering local buttons loop.");
             for (uint8_t i = 0; i < N_BUTTONS; i++)
             {
                 if (panel.getLedState(i) == OFF && panel.getButton(i))
                 {
                     Serial.print("Signalling request ");
                     packet packet(txNumber, TTL, COMMAND, REQUEST, i);
-                    sendPacket(packet);                    
+                    sendPacket(packet);
                     panel.blinkLed(i);
                     local[i] = true;
                     continue;
@@ -196,10 +195,10 @@ void loop()
         {
             Serial.printf("\n\rGot %u SYNC responses, biggest nodeID was %u\n\n", stack.getSize(), stack.getMaxSyncId());
             nodeId = stack.getMaxSyncId() + 1;
-            stack.clear();            
-            lastSync = millis();            
+            stack.clear();
+            lastSync = millis();
             break;
-        }    
+        }
         break;
 
     case LOWPOWER:
@@ -212,6 +211,7 @@ void loop()
     }
 
     Radio.IrqProcess();
+    panel.refreshLeds();
 }
 
 void OnTxDone(void)
@@ -252,7 +252,7 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 
     if (packet.getTtl() <= 0)
     {
-        Serial.print("\r\nTTL timeout, ignoring.");        
+        Serial.print("\r\nTTL timeout, ignoring.");
         return;
     }
 

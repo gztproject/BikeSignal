@@ -12,7 +12,7 @@ void btnPanel::begin()
 {
     for (uint8_t i : btnPins)
     {
-        pinMode(i, INPUT_PULLUP);
+        pinMode(i, INPUT);
     }
 
     for (uint8_t i : ledPins)
@@ -39,7 +39,8 @@ void btnPanel::refreshLeds()
     blinkLed();
     for (uint8_t i = 0; i < N_BUTTONS; i++)
     {
-        digitalWrite(ledPins[i], leds & 0x01 << i);
+        //Serial.printf("\n\ri:%u, leds: %u, thisLed: %u", i, leds, (leds & (0x01 << i)) > 0 ? HIGH : LOW);
+        digitalWrite(ledPins[i], (leds & (0x01 << i)) > 0 ? HIGH : LOW);
     }
 }
 
@@ -110,5 +111,5 @@ uint8_t btnPanel::getLedState(uint8_t led)
     {
         return BLINKING;
     }
-    return (leds & (0x01 << led))/(0x01 << led);
+    return (leds & (0x01 << led)) / (0x01 << led);
 }

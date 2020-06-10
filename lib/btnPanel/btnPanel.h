@@ -8,6 +8,10 @@
 #define N_BUTTONS 4
 #define DEFAULT_BLINK_TIME 500
 
+/**
+ *   
+ */
+
 class btnPanel
 {
 public:
