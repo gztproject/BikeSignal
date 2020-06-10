@@ -9,10 +9,12 @@
 
 #define SYNC_TIMEOUT 5 * 60 * 1000
 #define SYNC_ID 0b11111
-#define TX_DLY 100
+#define TX_DLY 200
 #define INIT_TIMEOUT (SYNC_ID * TX_DLY)
 
-#define BTN_PIN GPIO7
+#define SYNC_LED 2      //0 - green, 1 - blue, 2 - orange, 3 - red
+#define SYNC_DONE_LED 0 //0 - green, 1 - blue, 2 - orange, 3 - red
+#define SYNC_BLINK_TIME 200
 
 /*
  * set LoraWan_RGB to 1,the RGB active in loraWan
@@ -125,6 +127,7 @@ void setup()
         delay(100);
     }
 
+    panel.blinkLed(SYNC_LED, SYNC_BLINK_TIME);
     //turnOnRGB(COLOR_SEND, 0);
     packet syncPacket(0, TTL, nodeId);
     sendPacket(syncPacket);
@@ -139,11 +142,11 @@ void loop()
         //turnOnRGB(0, 0);
         Radio.Rx(0);
 
-        panel.readButtons();        
+        panel.readButtons();
 
         if (panel.state != oldState)
         {
-            Serial.print("\n\rButtons state changed, entering local buttons loop.");
+            Serial.print("\n\rButtons state changed, entering local buttons loop: ");
             for (uint8_t i = 0; i < N_BUTTONS; i++)
             {
                 if (panel.getLedState(i) == OFF && panel.getButton(i))
@@ -193,8 +196,17 @@ void loop()
 
         if (nodeId == SYNC_ID && millis() - lastSync > INIT_TIMEOUT)
         {
+            panel.ledOff(SYNC_LED);
             Serial.printf("\n\rGot %u SYNC responses, biggest nodeID was %u\n\n", stack.getSize(), stack.getMaxSyncId());
             nodeId = stack.getMaxSyncId() + 1;
+
+            panel.blinkLed(SYNC_DONE_LED, SYNC_BLINK_TIME);
+            uint32_t now = millis();
+            while (millis() - now < nodeId * 2 * SYNC_BLINK_TIME)
+            {
+                panel.refreshLeds();
+            }
+            panel.ledOff(SYNC_DONE_LED);
             stack.clear();
             lastSync = millis();
             break;
@@ -304,7 +316,14 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 void sendPacket(packet packet)
 {
     txPacket = packet;
-    delay(TX_DLY * nodeId);
+    if (nodeId < SYNC_ID)
+    {
+        uint32_t now = millis();
+        while ((millis() - now) < (TX_DLY * nodeId))
+        {
+            panel.refreshLeds();
+        }
+    }
     txPacket.decreaseTtl();
     if (packet.getTtl() <= 0)
     {
@@ -328,9 +347,9 @@ void executeCommand(packet packet)
 {
     uint8_t input = packet.getArg();
     uint8_t command = packet.getCommand();
-    Serial.print("Received external input ");
-    Serial.print(input);
-    Serial.println(", entering remote buttons loop.");
+
+    Serial.printf("\n\rReceived external input %u, entering remote buttons loop: ", input);
+
     for (uint8_t i = 0; i < N_BUTTONS; i++)
     {
 
