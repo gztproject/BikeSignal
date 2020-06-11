@@ -454,7 +454,7 @@ P 3200 4950
 F 0 "U2" H 3225 6556 50  0000 C CNN
 F 1 "HTCC-AB01" H 3225 6465 50  0000 C CNN
 F 2 "Modules:HTCC-AB01" H 2900 5350 50  0001 C CNN
-F 3 "" H 2900 5350 50  0001 C CNN
+F 3 "https://resource.heltec.cn/download/CubeCell/HTCC-AB01/HTCC-AB01_SchematicDiagram.pdf" H 2900 5350 50  0001 C CNN
 	1    3200 4950
 	1    0    0    -1  
 $EndComp
@@ -604,8 +604,6 @@ F 3 "~" H 6450 5400 50  0001 C CNN
 	1    6300 5450
 	1    0    0    -1  
 $EndComp
-NoConn ~ 6600 5450
-NoConn ~ 6600 5550
 NoConn ~ 6600 5650
 Wire Wire Line
 	6200 5850 6200 5900
@@ -666,8 +664,6 @@ F 3 "" H 7100 4800 50  0001 C CNN
 	1    7100 4800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	6600 5250 7200 5250
 NoConn ~ 3250 3750
 $Comp
 L power:+3.3V #PWR014
@@ -693,10 +689,137 @@ F 3 "~" H 6800 4600 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	6550 4800 7100 4800
+$Comp
+L Connector_Generic:Conn_01x04 J3
+U 1 1 5EE3CD6E
+P 7650 5450
+F 0 "J3" H 7730 5442 50  0000 L CNN
+F 1 "Conn_01x04" H 7730 5351 50  0000 L CNN
+F 2 "Connector_Wire:SolderWirePad_1x04_P3.81mm_Drill1mm" H 7650 5450 50  0001 C CNN
+F 3 "~" H 7650 5450 50  0001 C CNN
+	1    7650 5450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6300 5850 7450 5850
+Connection ~ 6300 5850
+Wire Wire Line
+	6600 5550 7450 5550
+Wire Wire Line
+	6600 5450 7450 5450
+Wire Wire Line
+	7450 5350 7200 5350
+Wire Wire Line
+	7200 5350 7200 5250
+Wire Wire Line
+	7450 5650 7450 5850
+Text Label 6600 5450 0    50   ~ 0
+USBD+
+Text Label 6600 5550 0    50   ~ 0
+USBD-
+$Comp
+L Connector_Generic:Conn_01x02 J4
+U 1 1 5EE50B8F
+P 3100 2400
+F 0 "J4" H 3018 2075 50  0000 C CNN
+F 1 "Conn_01x02" H 3018 2166 50  0000 C CNN
+F 2 "Connector_Wire:SolderWirePad_1x02_P3.81mm_Drill1mm" H 3100 2400 50  0001 C CNN
+F 3 "~" H 3100 2400 50  0001 C CNN
+	1    3100 2400
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	2900 2000 2900 2300
+Connection ~ 2900 2000
+Wire Wire Line
+	2300 2650 2900 2650
+Wire Wire Line
+	2900 2650 2900 2400
+Connection ~ 2300 2650
+$Comp
+L Device:D D2
+U 1 1 5EE62A33
+P 6850 5250
+F 0 "D2" H 6850 5033 50  0000 C CNN
+F 1 "D" H 6850 5124 50  0000 C CNN
+F 2 "Diodes_THT:D_A-405_P7.62mm_Horizontal" H 6850 5250 50  0001 C CNN
+F 3 "~" H 6850 5250 50  0001 C CNN
+	1    6850 5250
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6600 5250 6700 5250
+Wire Wire Line
+	7000 5250 7200 5250
+Connection ~ 7200 5250
+$Comp
+L Mechanical:MountingHole_Pad H1
+U 1 1 5EE693F5
+P 8900 4400
+F 0 "H1" H 9000 4449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 9000 4358 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3_Pad_Via" H 8900 4400 50  0001 C CNN
+F 3 "~" H 8900 4400 50  0001 C CNN
+	1    8900 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole_Pad H2
+U 1 1 5EE69DE3
+P 9100 4400
+F 0 "H2" H 9200 4449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 9200 4358 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3_Pad_Via" H 9100 4400 50  0001 C CNN
+F 3 "~" H 9100 4400 50  0001 C CNN
+	1    9100 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole_Pad H3
+U 1 1 5EE6A022
+P 9300 4400
+F 0 "H3" H 9400 4449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 9400 4358 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3_Pad_Via" H 9300 4400 50  0001 C CNN
+F 3 "~" H 9300 4400 50  0001 C CNN
+	1    9300 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole_Pad H4
+U 1 1 5EE6A268
+P 9500 4400
+F 0 "H4" H 9600 4449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 9600 4358 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3_Pad_Via" H 9500 4400 50  0001 C CNN
+F 3 "~" H 9500 4400 50  0001 C CNN
+	1    9500 4400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8900 4500 9100 4500
+Wire Wire Line
+	9100 4500 9300 4500
+Connection ~ 9100 4500
+Wire Wire Line
+	9300 4500 9500 4500
 Wire Bus Line
 	8200 800  8200 2650
 Wire Bus Line
 	6700 800  6700 2650
 Wire Bus Line
 	4550 800  4550 5250
+Connection ~ 9300 4500
+$Comp
+L power:GND #PWR019
+U 1 1 5EE6F33F
+P 8900 4500
+F 0 "#PWR019" H 8900 4250 50  0001 C CNN
+F 1 "GND" H 8905 4327 50  0000 C CNN
+F 2 "" H 8900 4500 50  0001 C CNN
+F 3 "" H 8900 4500 50  0001 C CNN
+	1    8900 4500
+	1    0    0    -1  
+$EndComp
+Connection ~ 8900 4500
 $EndSCHEMATC
