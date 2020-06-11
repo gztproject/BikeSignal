@@ -99529,331 +99529,331 @@ mynixies
 214-3339-00-0602J
 <b>3M TEXTOOL 14 pol. DIP</b> Lever actuated zero insertion force mechanism <p>
 Hersteller: 3M TEXTOOL<br>
-Herstellerbez.:  214-3339-00-0602J<br>
-Farnell Best.-Nr.: 4666290<br>
-Source: http://www.3M.com/ehpd
+0
+0
+0
 
 0
 14
 14
-mynixies
-5991-D-SUB
-
+0
+5991
+0
 
 0
 11
 11
-mynixies
-6844A-D-SUB
-This footprint uses female D-SUB pins as 'sockets'.
+0
+6844
+0
 
 0
 13
 13
-mynixies
-B13B
-Socket B13B print
+0
+0
+0
 
 0
 13
 13
-mynixies
-B17A-DSUB
-
+0
+0
+0
 
 0
 11
 11
-mynixies
-B5441-DSUB
-
+0
+0
+0
 
 0
 13
 13
-mynixies
-B5441-DSUB-ALLPINS
-
+0
+0
+0
 
 0
 16
 16
-mynixies
-CD11
-
+0
+0
+0
 
 0
 14
 14
-mynixies
-NE2-NEON-BULB-DRILL
-NE2 Neon-Bulb (cable mounting-hole)
+0
+0
+0
 
 0
 2
 2
-mynixies
-NE2-NEON-BULB-SMD
-NE2 Neon-Bulb (cable on surface mount)
+0
+0
+0
 
 0
 2
 2
-mynixies
-RTS-5-DSUB
-
+0
+0
+0
 
 0
 11
 11
-mynixies
-RTS-5-DSUB-ALLPINS
-
+0
+0
+0
 
 0
 17
 17
-mynixies
-RTS-11-DSUB
-
+0
+0
+0
 
 0
 11
 11
-mynixies
-RTS-14-DSUB
-
+0
+0
+0
 
 0
 14
 14
-mynixies
-ZM1000-DSUB
-
+0
+0
+0
 
 0
 14
 14
-mynixies
-ZM1042-AMP
-Socket with AMP-Discret Socket Contact Typ 1-380758-1
+0
+0
+0
 
 0
 13
 13
-mynixies
-ZM1042-DSUB
-Socket with D-SUB Sockets
+0
+0
+0
 
 0
 13
 13
-mynixies
-ZM1042-MULTI-CONTACT
-Socket with Multi-Contact (Mini-line Discret Socket Contact) Typ B1-B 41.0002
+0
+0
+0
 
 0
 13
 13
-nixiemisc
-2X06
-<b>PIN HEADER</b>
+0
+2
+0
 
 0
 12
 12
-nixiemisc
-B3U-1100P(M)
-
+0
+0
+0
 
 0
 3
 3
-nixiemisc
-CRYSTAL-SMD-2.0X1.6MM
-<h3>2.0 x 1.6 mm Crystal</h3>
+0
+0
+0
 <p><a href="http://www.murata.com/~/media/webrenewal/support/library/catalog/products/timingdevice/crystalu/p79e.ashx">Example Datasheet</a> (XRCGB_F_P)</p>
 
 0
 4
 4
-nixiemisc
-CRYSTAL2.0X1.6
+0
+0
 
 
 0
 4
 4
-nixiemisc
-DIL28-3
+0
+0
 <B>Dual In Line</B><p>
 package type P
 
 0
 28
 28
-nixiemisc
+0
 DIL28-3-ROUND
 
 
 0
 28
 28
-nixiemisc
+0
 DIP16
 <b>Dual In Line Package</b>
 
 0
 16
 16
-nixiemisc
+0
 DO-214AC
 <b>SURFACE MOUNT GENERAL RECTIFIER</b> JEDEC DO-214AC molded platic body<p>
 Method 2026<br>
 Source: http://www.kingtronics.com/SMD_M7/M7_SMD_4007.pdf
-
+0
 0
 2
 2
 nixiemisc
 DO-219AB
 
-
+0
 0
 2
 2
 nixiemisc
 DRC0010G
 
-
+0
 0
 11
 11
 nixiemisc
 HVPS1363
 
-
+0
 0
 0
 0
 nixiemisc
 LGA-16-3X3
 <h3>16-Pin Land Grid Array (LGA) (3 x 3 mm)</h3>
-<p><a href="https://www.sparkfun.com/datasheets/Sensors/Accelerometer/LIS331HH.pdf">Datasheet</a></p>
-<p>Specifications:
-<ul>
+0
+0
+0
 <li>Pin Count: 16</li>
 <li>Area: 3.0 x 3.0 x 1.0 mm</li>
 <li>Pitch: 0.5 mm</li>
 </ul>
-<p>Devices Using:</p>
-<ul>
-<li>LIS331</li>
+0
+0
+0
 <li>LIS3DH</li>
 </ul>
 
 0
 16
 16
-nixiemisc
+0
 MSOP08
 <b>Mini Small Outline Package</b>
 
 0
 8
 8
-nixiemisc
+0
 NA5880-AE
 
 
 0
 4
 4
-nixiemisc
+0
 PDSO-N12
 <h3>12-Pin VSON 2.5 x 4.0 mm IC</h3>
 <p><ul><li>Dimensions: 2.5 x 4.0 x 1.0 mm</li>
 <li>Pitch: 0.4mm</li>
-<li>Pins: 12 + Bottom Pad</li></p>
-<p>Used by the BQ27441 LiPo Fuel Gauge</p>
-<p><a href="http://www.ti.com/lit/ds/symlink/bq27441-g1.pdf">Example Datasheet</a></p>
+0
+0
+0
 <h4>
 
 0
 17
 17
-nixiemisc
-PLCC44
+0
+0
 <b>PLASTIC LEADED CHIP CARRIER</b><p>
 square
 
 0
 44
 44
-nixiemisc
+0
 PQFN50P300X300X100-16N
 
 
 0
 16
 16
-nixiemisc
+0
 QFN-32
 <h3>QFN 32-Pin package w/ Thermal Pad</h3>
 <b>***Unproven***</b>
 <br><br>
-<B>Applicable Parts:</b>
-<ul><li>TLC5940</ul>
-
+0
+0
+0
 0
 33
 33
 nixiemisc
-QFN-44-7X7
-<b>QFN-44</b> (7x7x1.8mm)<p>
-Source: http://www.st.com/stonline/products/literature/ds/11020.pdf
+0
+0
+0
 
 0
 45
 45
-nixiemisc
-QFN28-ML_6X6MM
-<b>QFN28-ML_6X6MM</b><p>
+0
+0
+0
 Source: http://www.microchip.com .. 39637a.pdf
 
 0
 29
 29
-nixiemisc
-QFN28G_0.5-5X5MM
+0
+0
 
 
 0
 29
 29
-nixiemisc
-QFN32
+0
+0
 <b>QFN 32</b><p>
 Source: http://www.ftdichip.com/Documents/DataSheets/DS_FT232R_v104.pdf
 
 0
 33
 33
-nixiemisc
+0
 S8E
 SOIC, 0.15 inch width
 
 0
 9
 9
-nixiemisc
+0
 S44
 <b>PLCC SOCKET</b>
 
 0
 44
 44
-nixiemisc
+0
 SO-08
 <B>Small Outline Narrow Plastic Gull Wing</B><p>
 150-mil body, package type SN
@@ -99872,100 +99872,100 @@ nixiemisc
 SO28W
 <B>28-Lead Plastic Small Outline (SO) </B> Wide, 300 mil Body (SOIC)</B><p>
 Source: http://ww1.microchip.com/downloads/en/devicedoc/39632c.pdf
-
+0
 0
 28
 28
 nixiemisc
 SOIC8
 <b>Small Outline IC</b>
-
+0
 0
 8
 8
 nixiemisc
 SOIC16-5.3MM
 
-
+0
 0
 16
 16
 nixiemisc
 SOT23
 <b>SOT-23</b>
-
+0
 0
 3
 3
 nixiemisc
 SOT23-5
 
-
+0
 0
 5
 5
 nixiemisc
 SOT25
 <b>Small Outline Transistor</b><p>
-TSC [Taiwan Semiconductor Company, Ltd]<br>
-Source: http://www.taiwansemi.com .. 5205_0409c.pdf
-
+0
+0
+0
 0
 5
 5
 nixiemisc
-SOT143
-<b>SOT-143</b>
-
+0
+0
+0
 0
 4
 4
 nixiemisc
-SOT143R_INFINEON
-<b>Small Outline Transistor; 4 leads</b> Reflow soldering<p>
-INFINEON, www.infineon.com/cmc_upload/0/000/010/257/eh_db_5b.pdf
+0
+0
+0
 
 0
 4
 4
-nixiemisc
-SSOP28
-<b>Shrink Small Outline Package</b><p>
+0
+0
+0
 package type SS
 
 0
 28
 28
-nixiemisc
-THT-100-35
+0
+0
 
 
 0
 2
 2
-nixiemisc
-THT-150-35
+0
+0
 
 
 0
 2
 2
-nixiemisc
-TSSOP-16
+0
+0
 <b>16-Lead Thin Shrink Small Outline Package</b> [TSSOP] (RU-16)<p>
 Source: 8x ADG1408_1409.pdf
 
 0
 16
 16
-nixiemisc
+0
 U.FL
 
 
 0
 3
 3
-nixiemisc
+0
 UMT6
 <b>UMT6 Package</b> EIAJ: SC-88<p>
 Source: http://www.rohm.com/products/databook/tr/pdf/umx1n.pdf
