@@ -133,10 +133,14 @@ void packet::debug()
         Serial.print("Command: ");
         if (getCommand() == REQUEST)
             Serial.print("Request");
-        if (getCommand() == CANCEL)
+        else if (getCommand() == CANCEL)
             Serial.print("Cancel");
-        if (getCommand() == ACKNOWLEDGE)
+        else if (getCommand() == ACKNOWLEDGE)
             Serial.print("Acknowledge");
+        else if (getCommand() == CLEAR)
+            Serial.print("Clear");
+        else
+            Serial.print("Unknown");
         Serial.printf(", ARG %u", getArg());
     }
 }

@@ -92,7 +92,8 @@ void btnPanel::ledOff(uint8_t led)
 
 void btnPanel::clearLed(uint8_t led)
 {
-    leds &= 0x00 << led;
+    //Serial.printf("\n\rClearing led %u. Current state: %X; Mask: %X; New state: %X.", led, leds, (uint8_t)(~(0x01 << led)), leds & (~(0x01 << led)));
+    leds &= (~(0x01 << led));
 }
 
 void btnPanel::ledToggle(uint8_t led)

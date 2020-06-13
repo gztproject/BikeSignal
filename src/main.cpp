@@ -151,7 +151,7 @@ void loop()
             {
                 if (panel.getLedState(i) == OFF && panel.getButton(i))
                 {
-                    Serial.print("Signalling request ");
+                    Serial.printf("Signalling request %u", i);
                     packet packet(txNumber, TTL, COMMAND, REQUEST, i);
                     sendPacket(packet);
                     panel.blinkLed(i);
@@ -160,21 +160,18 @@ void loop()
                 }
                 if (panel.getLedState(i) == ON && panel.getButton(i))
                 {
-                    if (!local[i])
-                    {
-                        Serial.print("Clearing ACK ");
-                        packet packet(txNumber, TTL, COMMAND, CLEAR, i);
-                        sendPacket(packet);
-                        panel.ledOff(i);
-                        local[i] = true;
-                    }
+                    Serial.printf("Clearing ACK %u", i);
+                    packet packet(txNumber, TTL, COMMAND, CLEAR, i);
+                    sendPacket(packet);
+                    panel.ledOff(i);
+                    local[i] = true;
                     continue;
                 }
                 if (panel.getLedState(i) == BLINKING && panel.getButton(i))
                 {
                     if (local[i])
                     {
-                        Serial.print("Cancelling request ");
+                        Serial.printf("Cancelling request %u", i);
                         packet packet(txNumber, TTL, COMMAND, CANCEL, i);
                         sendPacket(packet);
                         panel.ledOff(i);
@@ -182,7 +179,7 @@ void loop()
                     }
                     else
                     {
-                        Serial.print("Sending ACK for request ");
+                        Serial.printf("Sending ACK for request %u", i);
                         packet packet(txNumber, TTL, COMMAND, ACKNOWLEDGE, i);
                         sendPacket(packet);
                         panel.ledOn(i);
@@ -190,8 +187,8 @@ void loop()
                     }
                     continue;
                 }
-                oldState = panel.state;
             }
+            oldState = panel.state;
         }
 
         if (nodeId == SYNC_ID && millis() - lastSync > INIT_TIMEOUT)
@@ -351,9 +348,7 @@ void executeCommand(packet packet)
     Serial.printf("\n\rReceived external input %u, entering remote buttons loop: ", input);
 
     for (uint8_t i = 0; i < N_BUTTONS; i++)
-    {
-
-        //if (panel.getLedState(i) == 0 && input == i)
+    {        
         if (command == REQUEST && input == i)
         {
             Serial.print("Received request ");
@@ -363,7 +358,6 @@ void executeCommand(packet packet)
             local[i] = false;
             continue;
         }
-        //if (panel.getLedState(i) == 1 && input == i)
         if (command == CLEAR && input == i)
         {
             Serial.print("Received clear ACK ");
@@ -373,7 +367,6 @@ void executeCommand(packet packet)
             local[i] = false;
             continue;
         }
-        //if (panel.getLedState(i) == 2 && input == i)
         if (command == CANCEL && input == i)
         {
             Serial.print("Received cancellation for request ");
